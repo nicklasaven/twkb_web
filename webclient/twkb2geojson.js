@@ -34,28 +34,23 @@ function twkb2geojson(ta,the_map, map_name)
 		
 		/*Method tells what compression method is used*/
 		ta_struct.method=(flag&0x0E)>>1;
-//		alert("method="+ta_struct.method);
 		/*precission gives the factor to divide the coordinate with, giving the right value and number of deciamal digits*/
 		var precision=(flag&0xF0)>>4;
 		ta_struct.factor=Math.pow(10,precision);
-//		alert("factor="+ta_struct.factor);		
 		/*Here comes a byte containgin type and number of dimmension information*/
 		var flag = ta[ta_struct.cursor];
 		ta_struct.cursor++;
 			
 		var typ=flag&0x1F;	
-//		alert("typ="+typ);	
 		ta_struct.ndims=(flag&0xE0)>>5;	
 				// we store each geoemtry in a object, "geom"
 
 		
-		/*This variable will carry the last refpoint in a pointarray to the next pointarray. It will hold one value per dimmension. For now we just give it the min INT32 number to indicate that we don't have a refpoint yet*/
-		//var refpoint = [min_sizes[4]];		
+		/*This variable will carry the last refpoint in a pointarray to the next pointarray. It will hold one value per dimmension. For now we just give it the min INT32 number to indicate that we don't have a refpoint yet*/		
 		var buffer = new ArrayBuffer(20);
 		ta_struct.refpoint = new Int32Array(buffer);
 		ta_struct.refpoint[0]=min_sizes[4];
 		ta_struct.ta=ta;
-	//	ta_struct={"method":method,"ta":ta,"ndims":ndims,"cursor":cursor, "little":little, "factor":factor, "refpoint":refpoint};
 		
 		
 		/*If POINT*/			
@@ -323,7 +318,6 @@ function read_pa_m1(ta_struct)
 			{	
 				ta_struct.refpoint[j]=ReadVarSInt64(ta_struct);
 				ta_struct.coords[0][j]=ta_struct.refpoint[j]/factor;
-	//				console.log(' j=%d, val=%s, ta_struct.cursor=%d',j,ta_struct.coords[0][j],ta_struct.cursor);
 			}	
 		start=1;
 	}	
@@ -334,8 +328,7 @@ function read_pa_m1(ta_struct)
 		for (j =0;j<(ndims);j++)
 		{
 			ta_struct.refpoint[j]+=ReadVarSInt64(ta_struct);
-			ta_struct.coords[i][j]=ta_struct.refpoint[j]/factor;		
-	//console.log('i=%d, j=%d, val=%s, ta_struct.cursor=%d',i,j,ta_struct.coords[0][j],ta_struct.cursor);			
+			ta_struct.coords[i][j]=ta_struct.refpoint[j]/factor;				
 		}
 	}
 	return 0;	
