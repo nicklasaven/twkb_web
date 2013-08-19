@@ -10,10 +10,10 @@ function init()
 {
 	
 	
-//Open Streetmap karta fr?n cloudmade
+//Open Streetmap karta från cloudmade
 	var	os =	L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
 		maxZoom: 18,
-		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery ? <a href="http://cloudmade.com">CloudMade</a>'
+		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
 	});
 	
 
@@ -23,9 +23,16 @@ function init()
 		epsg: 4326,
 		attribution:'<a href="http://www.statkart.no">Kartverket</a>, <a href="http://www.statkart.no/nor/Land/Fagomrader/Geovekst/">Geovekst</a> og <a href="http://www.statkart.no/?module=Articles;action=Article.publicShow;ID=14194">kommuner</a>'
 	});	
-
 	
-//L?gg upp listan med bakgrundskartor
+
+	var topo2 = L.tileLayer.wms('http://wms.geonorge.no/skwms1/wms.topo2?', {
+		layers:	'topo2_wms',
+		format: 'image/png',
+		epsg: 4326,
+		attribution:'<a href="http://www.statkart.no">Kartverket</a>, <a href="http://www.statkart.no/nor/Land/Fagomrader/Geovekst/">Geovekst</a> og <a href="http://www.statkart.no/?module=Articles;action=Article.publicShow;ID=14194">kommuner</a>'
+	});
+	
+//Lägg upp listan med bakgrundskartor
 	var baseMaps = 
 	{
 
@@ -34,7 +41,7 @@ function init()
 	var overlayMaps =
 	{
 		"Open StreetMap": os,
-		"Statens Kartverk, ?ppna": topo2_open,
+		"Statens Kartverk, öppna": topo2_open,
 		"Statens Kartverk": topo2
 	}
 
@@ -47,7 +54,7 @@ function init()
 
 	
 	
-//l?gg till skala och kartv?ljare
+//lägg till skala och kartväljare
 	L.control.scale({position: 'bottomright',imperial:false}).addTo(map);
 	L.control.layers(baseMaps, overlayMaps).addTo(map);		
 
@@ -174,28 +181,6 @@ function hjd()
 	else
 	{
 		map.removeLayer(hojd);		
-	}
-}
-
-	var punkter=L.layerGroup();
-	 ready["punkter"]=0;
-function pnkt()
-{
-	if(document.getElementById("pnkt").checked)
-	{
-		if (!ready["punkter"])
-		{
-			var map_name="punkter";
-			check[map_name]={};
-			get_map(punkter,map_name);
-			ready["punkter"]=1;
-		}
-		map.addLayer(punkter);
-		
-	}
-	else
-	{
-		map.removeLayer(punkter);		
 	}
 }
 

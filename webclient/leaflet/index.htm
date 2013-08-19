@@ -1,0 +1,77 @@
+﻿
+
+<!DOCTYPE html>
+<html>
+	<head>
+	<title>Demo Tiny WKB</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6/leaflet.css" />
+	<!--[if lte IE 8]>
+	    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6/leaflet.ie.css" />
+	<![endif]-->
+	<script>L_PREFER_CANVAS = true;</script>
+
+	<script src="http://178.79.156.122/twkb_node/twkb.js"></script >
+	<script src="http://cdn.leafletjs.com/leaflet-0.6/leaflet.js"></script>
+	<script src="http://178.79.156.122/twkb_node/kart.js"></script >	
+	<style>
+		body {
+			padding: 0;
+			margin: 0;
+		}
+		html, body 
+		{
+			height: 100%;
+			z-index:1;
+		}
+		#map {
+			height: 90%;
+			width: 700px;
+			z-index:1;
+		}
+	</style>
+	</head>
+	<body onload="init()">
+		<div id="map"></div>
+
+
+
+<div style="position:absolute;top:50px;left:720px;">
+<label><input type="checkbox" id="kom_org" onchange="kom_org()">Municipalities</label><br><br>
+
+<b>N2000 maps</b><br>
+<label><input type="checkbox" id="ad" onchange="ad()">Areal Types</label><br>
+<label><input type="checkbox" id="kom" onchange="kommune()">Municipalities, simplified</label><br>
+<label><input type="checkbox" id="hjd" onchange="hjd()">Height</label><br>
+<label><input type="checkbox" id="sf" onchange="sf()">Roads</label><br><br><br>
+<button onclick="get_capabilities()">getCapabilites</button><br>
+<p>Those maps comes from<br>Norwegiean map authority <a href="http://kartverket.no">Kartverket</a></p>
+<p>
+They can be found <a href="http://kartverket.no/Kart/Kartdata/Vektorkart/N2000/">here</a></p>
+</div>
+<div style="position:absolute;top:450px;left:720px;border:1px;width:300px;">
+<p>This is a map to show <a href="http://blog.jordogskog.no/2013/04/09/tiny-wkb/"  target="blog">TWKB</a> (a compressed geometry format) over
+<a href="http://blog.jordogskog.no/2013/04/29/more-twkb/" target="blog">NodeJS and websockets.</a>
+<br>
+Since websockets works cross domain, you can download this .htm file and open it locally, or on another webserver.
+The websocket can take a few parameters, decribed <a href="http://blog.jordogskog.no/2013/05/05/mapservice-from-websocket-with-twkb/"  target="blog">here</a>
+</p>
+
+<p>
+any questions or comments?<br>
+You find contact info in the <a href="http://blog.jordogskog.no"  target="blog">blog</a><br><br>
+/Nicklas Avén
+</p>
+</div>
+	</body>
+	</html>
+
+
+
+
+
+
+
+

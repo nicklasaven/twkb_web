@@ -1,9 +1,4 @@
-/*This is a nodejs webserver, serving a websocket with TWKB-geometries
 
-This is just for showing some ideas how it can be done*/
-
-
-/*This first part describes the layers available. It should of course be moved out to a config file or to the database.*/
 my_maps={
 	"kom_org":{
 		"geometry_column":"geom",
@@ -60,6 +55,11 @@ var keys = [];
 	for(var name in my_maps) 
 	keys.push(name);
 
+
+
+//console.log(my_maps["kom"]);
+/*	
+*/
 
 var WebSocketServer = require('ws').Server
   , express = require('express')
@@ -149,7 +149,7 @@ else
 				parameters[n_parameters++]=my_map.default_precision;
 			}
 			
-			sql_txt=sql_txt+"ST_AsTWKB("+geometry_column+",$"+n_parameters+","+my_map.id_column+",'NDR') geom FROM "+my_map.sql_from;			
+			sql_txt=sql_txt+"ST_AsTWKB("+geometry_column+",$"+n_parameters+","+my_map.id_column+",'NDR',1) geom FROM "+my_map.sql_from;			
 			
 			if(the_call.center && the_call.center.x && the_call.center.y)
 				{	
@@ -164,6 +164,8 @@ else
 					sql_txt=sql_txt+" ORDER BY "+ the_point + "<#>"+my_map.geometry_column;
 				}
 
+//console.log("sql_txt:%s",sql_txt);
+//console.log("parameters:%s",parameters);
 			var query = client.query(sql_txt,parameters);
 			var attr=[the_call.nr];
 
@@ -176,7 +178,12 @@ else
 				ws.send(JSON.stringify(attr),{binary: false});
 				ws.send(row.geom,{binary: true});
 			});	
-
+	
+		//fired after last row is emitted
+		/*query.on('end', function() 
+		{ 
+		console.log('klart');
+		});*/		
 		}
 		});
 	});
