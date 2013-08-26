@@ -149,7 +149,7 @@ else
 				parameters[n_parameters++]=my_map.default_precision;
 			}
 			
-			sql_txt=sql_txt+"ST_AsTWKB("+geometry_column+",$"+n_parameters+","+my_map.id_column+",'NDR',1) geom FROM "+my_map.sql_from;			
+			sql_txt=sql_txt+"ST_AsTWKB("+geometry_column+",$"+n_parameters+","+my_map.id_column+") geom FROM "+my_map.sql_from;			
 			
 			if(the_call.center && the_call.center.x && the_call.center.y)
 				{	

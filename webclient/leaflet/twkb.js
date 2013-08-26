@@ -1,12 +1,5 @@
 
-MaxInt8   =-1+(1<<7);
-MaxInt16  = -1+(1<<15) ;
-MaxInt32  = -1+(1<<31);
-
-min_sizes=[];
-min_sizes[1]   = -1 << 7;
-min_sizes[2]  = -1<< 15;
-min_sizes[4]  = -1<< 31;
+var min_size  = -1<< 63;
 
 var d = new Date();
 var  tid=[];
@@ -85,9 +78,6 @@ function read_pa(ta_struct)
 {
 		switch(ta_struct.method)
 		{
-			case 0:
-				read_pa_m0(ta_struct);
-			break;
 			case 1:
 				read_pa_m1(ta_struct);
 			break;
@@ -137,7 +127,7 @@ function read_pa_m1(ta_struct)
 	
 	start=0;	
 	/*If we don't have a reference point yet (This is the first point in the twkb)*/
-	if(ta_struct.refpoint[0] ==min_sizes[4])
+	if(ta_struct.refpoint[0] ==min_size)
 	{
 		for (j =0;j<(ndims);j++)
 			{	
@@ -160,83 +150,13 @@ function read_pa_m1(ta_struct)
 	}
 	return 0;	
 }
-function read_pa_m0(ta_struct)
-{
-	ta_struct.coords=[];
-	var ndims=ta_struct.ndims;
-	var little=ta_struct.little;
-	var factor=ta_struct.factor;
-	var npoints=ta_struct.npoints;
-	var coords=[];	
-	var last_size=1;
-	var start;
-	ta_struct.coords[0]=[];
-	
-	/*If we don't have a reference point yet (This is the first point in the twkb)*/
-	if(ta_struct.refpoint[0] ==min_sizes[4])
-	{
-		for (j =0;j<(ndims);j++)
-			{	
-				ta_struct.refpoint[j]=ReadVarSInt64(ta_struct);
-				ta_struct.coords[0][j]=ta_struct.refpoint[j]/factor;
-			}	
-		start=1;
-	}
-	else	
-		start=0;
-	
-	/*When we iterate the points there  is a rule we have to follow
-	if we meet the minimum value the used data-type can hold; then that is a flag that we are changing the data-type.
-	The next byte after that tells what the new data-type is. The alternatives is Int8, Int16 and Int32*/
-	for (i =start;i<(npoints);i++)
-	{
-		ta_struct.coords[i]=[];
-		for (j =0;j<(ndims);j++)
-		{
-			do 
-			{
-				switch(last_size)
-				{
-					case 1:
-						ta_struct.refpoint[4]=((ta_struct.ta[ta_struct.cursor]<<24)>>24);
-					break;
-					case 2:
-						ta_struct.refpoint[4]=(readInt16(ta_struct.ta,ta_struct.cursor,little));
-					break;
-					case 4:
-						ta_struct.refpoint[4]=(readInt32(ta_struct.ta,ta_struct.cursor,little));
-					break;
-				}	
-				ta_struct.cursor+=last_size;
-				if(ta_struct.refpoint[4]==min_sizes[last_size])
-				{
-				
-					last_size=(ta_struct.ta[ta_struct.cursor]<<24)>>24;
-					ta_struct.cursor++;
-				
-					ta_struct.refpoint[4]=0;					
-				}
-				else
-				{
-					var id=ta_struct.feature.id;	
-					ta_struct.refpoint[j]+=ta_struct.refpoint[4];
-					ta_struct.coords[i][j]=ta_struct.refpoint[j]/factor;
-					ta_struct.refpoint[4]=0;
-					break;
-				}
-				
-			} while (1==1)
-		}
-	}
-	return 0;
-}	
 
 function parse_point(ta_struct)
 {
 	
 	ta_struct.feature.geometry.type="Point";			
-	
-	ta_struct.feature.id=ReadVarInt64(ta_struct);
+	if(ta_struct.id)
+		ta_struct.feature.id=ReadVarInt64(ta_struct);
 	ta_struct.npoints=1;
 	read_pa(ta_struct);
 	ta_struct.feature.geometry.coordinates = [];
@@ -246,7 +166,8 @@ function parse_point(ta_struct)
 function parse_line(ta_struct)
 {	
 	ta_struct.feature.geometry.type="LineString";		
-	ta_struct.feature.id=ReadVarInt64(ta_struct);	
+	if(ta_struct.id)
+		ta_struct.feature.id=ReadVarInt64(ta_struct);
 	ta_struct.npoints=ReadVarInt64(ta_struct);
 	read_pa(ta_struct);	
 
@@ -255,10 +176,9 @@ function parse_line(ta_struct)
 function parse_polygon(ta_struct)
 {
 	ta_struct.feature.geometry={};
-	ta_struct.feature.geometry.type="Polygon";
-		
-	ta_struct.feature.id=ReadVarInt64(ta_struct);
-		
+	ta_struct.feature.geometry.type="Polygon";		
+	if(ta_struct.id)
+		ta_struct.feature.id=ReadVarInt64(ta_struct);		
 	nrings=ReadVarInt64(ta_struct);
 	ta_struct.feature.geometry.coordinates=[];
 	for (ring=0;ring<nrings;ring++)
@@ -275,8 +195,8 @@ function parse_multipoint(ta_struct)
 {
 	
 	ta_struct.feature.geometry.type="MultiPolyline";
-	ta_struct.feature.id=ReadVarInt64(ta_struct);		
-
+	if(ta_struct.id)
+		ta_struct.feature.id=ReadVarInt64(ta_struct);
 	ta_struct.npoints=ReadVarInt64(ta_struct);
 		
 	read_pa(ta_struct);
@@ -287,8 +207,8 @@ function parse_multipoint(ta_struct)
 function parse_multilinestring(ta_struct)
 {	
 	ta_struct.feature.geometry.type="MultiLineString";
-	ta_struct.feature.id=ReadVarInt64(ta_struct);				
-	
+	if(ta_struct.id)
+		ta_struct.feature.id=ReadVarInt64(ta_struct);	
 	ngeoms=ReadVarInt64(ta_struct);
 	
 	
@@ -307,7 +227,8 @@ function parse_multipolygon(ta_struct)
 {
 	
 	ta_struct.feature.geometry.type="MultiPolygon";
-	ta_struct.feature.id=ReadVarInt64(ta_struct);				
+	if(ta_struct.id)
+		ta_struct.feature.id=ReadVarInt64(ta_struct);				
 
 	ngeoms=ReadVarInt64(ta_struct);
 	
@@ -381,8 +302,8 @@ function parse_binary(ta,the_map, map_name)
 		var flag = ta[ta_struct.cursor];
 		ta_struct.cursor ++;
 			
-		/*If little endianess variable "little" is 1 and 0 if big endianess*/
-		ta_struct.little=flag&0x01;
+		/*1 if ID is used, = if not*/
+		ta_struct.id=flag&0x01;
 		
 		/*Method tells what compression method is used*/
 		ta_struct.method=(flag&0x0E)>>1;
@@ -402,10 +323,10 @@ function parse_binary(ta,the_map, map_name)
 
 		
 		/*This variable will carry the last refpoint in a pointarray to the next pointarray. It will hold one value per dimmension. For now we just give it the min INT32 number to indicate that we don't have a refpoint yet*/
-		//var refpoint = [min_sizes[4]];		
+		//var refpoint = [min_size];		
 		var buffer = new ArrayBuffer(20);
 		ta_struct.refpoint = new Int32Array(buffer);
-		ta_struct.refpoint[0]=min_sizes[4];
+		ta_struct.refpoint[0]=min_size;
 		ta_struct.ta=ta;
 	//	ta_struct={"method":method,"ta":ta,"ndims":ndims,"cursor":cursor, "little":little, "factor":factor, "refpoint":refpoint};
 		
@@ -538,73 +459,3 @@ function build(id,the_map,map_name)
 	
 	delete check[map_name][id];
 }
-
-/*Here comes some bit-fiddling functions. They seems faster than the dataview-functions, but it's kind of ugly*/
-function readUInt32(source,start,littleEndian) {
-  var a0 = source[start+0],
-      a1 = source[start+1],
-      a2 = source[start+2],
-      a3 = source[start+3];
-  
-  if (littleEndian)
-    return ((a3 << 24) >>> 0) + (a2 << 16) + (a1 << 8) + (a0);
-  else
-    return ((a0 << 24) >>> 0) + (a1 << 16) + (a2 << 8) + (a3);
-}
-function readUInt16(source,start,littleEndian) {
-  var a0 = source[start+0],
-      a1 = source[start+1];
-  
-  if (littleEndian)
-    return ((a1 << 8) >>> 0) + (a0);
-  else
-    return ((a0 << 8) >>> 0) +(a1);
-}
-
- function readInt16(source,start,littleEndian) {
-  var a0 = source[start+0],
-      a1 = source[start+1];
-  
-  if (littleEndian)
-  {
-	if(a1&(1<<7))
-	{
-	return  -((~(((a1 << 8) >>> 0) + (a0))+1)&(0xFFFF));
-	}
-	else
-		return (a1 << 8)  + (a0);
-    }
-  else
-  {
-	if(a0&(1<<7))
-	{
-	return  -((~(((a0 << 8) >>> 0) + (a1))+1)&(0xFFFF));
-	}
-	else
-		return (a0 << 8)  + (a1);
-}
-}
-       function readInt32(source,start,littleEndian) {
-      var a0 = source[start+0],
-          a1 = source[start+1],
-      a2 = source[start+2],
-      a3 = source[start+3];    
-      if (littleEndian)
-          {
-		if(a3&(1<<7))
-		{
-			return -(~( (a3 << 24) + (a2 << 16) + (a1 << 8) + (a0))+1);
-		}
-		else
-		{		
-			return  (a3 << 24) + (a2 << 16) + (a1 << 8) + (a0);
-		}
-	}
-      else
-      {
-		if(a0&(1<<7))
-			return  (~((a0 << 24) + (a1 << 16) + (a2 << 8) + (a3))+1);
-		else
-			return (a0 << 24) + (a1 << 16) + (a2 << 8) + (a3);
-	}
-    }
