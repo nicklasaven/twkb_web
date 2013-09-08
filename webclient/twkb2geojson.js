@@ -2,10 +2,10 @@
 This file describes how twkb can be read into a geoJSON object.
 
 This file can be freely copied, modified and redistributed as you like.
-If you find better ways of doing this it would be nice if you published it, or you will be seen as extremly greedy :-)
+If you develop this further I would appreciate if you shared it, or you will be seen as extremly greedy :-)
 
 Origanally written by
-Nickas Avén
+Nickas Avï¿½n
 Outer periphery FOSS Technology
 **********************************************************************************************************************/
 var min_size  = -1<< 63;
